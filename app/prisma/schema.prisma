@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MeasurementUnit {
+  CREDIT
+  HOURS
+}
+
+enum CourseStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+enum SessionStatus {
+  OPEN
+  CANCELLED
+}
+
+model CourseCategory {
+  id                      String   @id @default(uuid())
+  name                    String   @unique
+  countsTowardAnnualHours Boolean  @default(true)
+  defaultHours            Float?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  courses                 Course[]
+}
+
+model Course {
+  id                 String          @id @default(uuid())
+  name               String
+  categoryId         String
+  category           CourseCategory  @relation(fields: [categoryId], references: [id])
+  measurementUnit    MeasurementUnit
+  measurementValue   Float
+  requiresReflection Boolean         @default(true)
+  isGroupCourse      Boolean         @default(false)
+  status             CourseStatus    @default(DRAFT)
+  knowledgeBaseRef   String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  createdBy          String
+  sessions           CourseSession[]
+}
+
+model CourseSession {
+  id             String        @id @default(uuid())
+  courseId       String
+  course         Course        @relation(fields: [courseId], references: [id])
+  startDate      DateTime
+  endDate        DateTime?
+  location       String
+  instructorName String
+  capacity       Int
+  enrolledCount  Int           @default(0)
+  status         SessionStatus @default(OPEN)
+  cancelledAt    DateTime?
+  cancelledBy    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
