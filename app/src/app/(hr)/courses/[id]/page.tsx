@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCourseById } from '@/lib/courses/service'
+import CourseStatusButton from './CourseStatusButton'
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -15,6 +16,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   const statusLabel: Record<string, string> = {
     DRAFT: '草稿', ACTIVE: '上架', INACTIVE: '下架',
   }
+  const statusColor: Record<string, string> = {
+    DRAFT: 'bg-gray-100 text-gray-700',
+    ACTIVE: 'bg-green-100 text-green-700',
+    INACTIVE: 'bg-red-100 text-red-700',
+  }
   const sessionStatusLabel: Record<string, string> = {
     OPEN: '開放報名', CANCELLED: '已取消',
   }
@@ -26,34 +32,45 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
           <Link href="/courses" className="text-sm text-blue-600 hover:underline">← 返回課程列表</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{course.name}</h1>
         </div>
-        <Link href={`/courses/${id}/edit`} className="bg-white border text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">
-          編輯
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href={`/courses/${id}/edit`}
+            className="bg-white border text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50"
+          >
+            編輯
+          </Link>
+          <CourseStatusButton courseId={id} currentStatus={course.status} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900">課程資訊</h2>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between"><dt className="text-gray-500">類別</dt><dd>{course.category.name}</dd></div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500">計量</dt>
-              <dd>{course.measurementValue} {course.measurementUnit === 'HOURS' ? '小時' : '學分'}</dd>
-            </div>
-            <div className="flex justify-between"><dt className="text-gray-500">心得必填</dt><dd>{course.requiresReflection ? '是' : '否'}</dd></div>
-            <div className="flex justify-between"><dt className="text-gray-500">集團內課程</dt><dd>{course.isGroupCourse ? '是' : '否'}</dd></div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500">狀態</dt>
-              <dd><span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{statusLabel[course.status]}</span></dd>
-            </div>
-          </dl>
-        </div>
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 mb-4">課程資訊</h2>
+        <dl className="grid grid-cols-2 gap-4 text-sm">
+          <div><dt className="text-gray-500">類別</dt><dd className="mt-1">{course.category.name}</dd></div>
+          <div>
+            <dt className="text-gray-500">計量</dt>
+            <dd className="mt-1">{course.measurementValue} {course.measurementUnit === 'HOURS' ? '小時' : '學分'}</dd>
+          </div>
+          <div><dt className="text-gray-500">心得必填</dt><dd className="mt-1">{course.requiresReflection ? '是' : '否'}</dd></div>
+          <div><dt className="text-gray-500">集團內課程</dt><dd className="mt-1">{course.isGroupCourse ? '是' : '否'}</dd></div>
+          <div>
+            <dt className="text-gray-500">狀態</dt>
+            <dd className="mt-1">
+              <span className={`inline-flex px-2 py-0.5 rounded-full text-xs ${statusColor[course.status]}`}>
+                {statusLabel[course.status]}
+              </span>
+            </dd>
+          </div>
+        </dl>
       </div>
 
       <div className="bg-white rounded-lg shadow">
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="font-semibold text-gray-900">梯次列表</h2>
-          <Link href={`/courses/${id}/sessions/new`} className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">
+          <Link
+            href={`/courses/${id}/sessions/new`}
+            className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700"
+          >
             新增梯次
           </Link>
         </div>
