@@ -7,6 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum EmployeeRole {
+  EMPLOYEE
+  MANAGER
+  HR
+}
+
+enum EnrollmentStatus {
+  PENDING_MANAGER
+  PENDING_HR
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+enum WaitlistStatus {
+  WAITING
+  PENDING_CONFIRMATION
+  CONFIRMED
+  EXPIRED
+  CANCELLED
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  RETRYING
+}
+
+enum NotificationEventType {
+  ENROLLMENT_SUBMITTED
+  MANAGER_REVIEW_NEEDED
+  MANAGER_APPROVED
+  MANAGER_REJECTED
+  HR_APPROVED
+  HR_REJECTED
+  WAITLIST_JOINED
+  WAITLIST_PROMOTED
+  WAITLIST_EXPIRED
+  SESSION_CANCELLED
+  ENROLLMENT_CANCELLED
+  NOTIFICATION_FAILED
+}
+
 enum MeasurementUnit {
   CREDIT
   HOURS
@@ -65,4 +109,87 @@ model CourseSession {
   cancelledBy    String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+
+  enrollments     CourseEnrollment[]
+  waitlistEntries WaitlistEntry[]
+}
+
+model Employee {
+  id           String       @id @default(uuid())
+  name         String
+  email        String       @unique
+  adAccount    String       @unique
+  department   String
+  unit         String
+  role         EmployeeRole @default(EMPLOYEE)
+  managerId    String?
+  manager      Employee?    @relation("ManagerRelation", fields: [managerId], references: [id])
+  subordinates Employee[]   @relation("ManagerRelation")
+  hireDate     DateTime
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  enrollments      CourseEnrollment[] @relation("EnrollmentApplicant")
+  managerReviews   CourseEnrollment[] @relation("EnrollmentManagerReviewer")
+  hrReviews        CourseEnrollment[] @relation("EnrollmentHrReviewer")
+  waitlistEntries  WaitlistEntry[]
+  notificationLogs NotificationLog[]
+}
+
+model CourseEnrollment {
+  id                  String           @id @default(uuid())
+  employeeId          String
+  employee            Employee         @relation("EnrollmentApplicant", fields: [employeeId], references: [id])
+  sessionId           String
+  session             CourseSession    @relation(fields: [sessionId], references: [id])
+  status              EnrollmentStatus @default(PENDING_MANAGER)
+  managerNote         String?
+  hrNote              String?
+  reviewedByManagerId String?
+  reviewedByManager   Employee?        @relation("EnrollmentManagerReviewer", fields: [reviewedByManagerId], references: [id])
+  reviewedByHrId      String?
+  reviewedByHr        Employee?        @relation("EnrollmentHrReviewer", fields: [reviewedByHrId], references: [id])
+  managerReviewedAt   DateTime?
+  hrReviewedAt        DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  notifications NotificationLog[]
+}
+
+model WaitlistEntry {
+  id              String         @id @default(uuid())
+  employeeId      String
+  employee        Employee       @relation(fields: [employeeId], references: [id])
+  sessionId       String
+  session         CourseSession  @relation(fields: [sessionId], references: [id])
+  position        Int
+  status          WaitlistStatus @default(WAITING)
+  notifiedAt      DateTime?
+  confirmDeadline DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([employeeId, sessionId])
+  @@index([sessionId, position])
+}
+
+model NotificationLog {
+  id             String                @id @default(uuid())
+  recipientEmail String
+  recipientId    String
+  recipient      Employee              @relation(fields: [recipientId], references: [id])
+  eventType      NotificationEventType
+  enrollmentId   String?
+  enrollment     CourseEnrollment?     @relation(fields: [enrollmentId], references: [id])
+  sessionId      String?
+  subject        String
+  body           String
+  status         NotificationStatus    @default(PENDING)
+  retryCount     Int                   @default(0)
+  lastAttemptAt  DateTime?
+  sentAt         DateTime?
+  errorMessage   String?
+  createdAt      DateTime              @default(now())
 }

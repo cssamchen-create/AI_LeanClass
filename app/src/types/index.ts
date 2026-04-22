@@ -1,6 +1,18 @@
-import type { Course, CourseCategory, CourseSession, CourseStatus, MeasurementUnit, SessionStatus } from '@prisma/client'
+import type {
+  Course, CourseCategory, CourseSession, CourseStatus, MeasurementUnit, SessionStatus,
+  Employee, EmployeeRole,
+  CourseEnrollment, EnrollmentStatus,
+  WaitlistEntry, WaitlistStatus,
+  NotificationLog, NotificationStatus, NotificationEventType,
+} from '@prisma/client'
 
-export type { Course, CourseCategory, CourseSession, CourseStatus, MeasurementUnit, SessionStatus }
+export type {
+  Course, CourseCategory, CourseSession, CourseStatus, MeasurementUnit, SessionStatus,
+  Employee, EmployeeRole,
+  CourseEnrollment, EnrollmentStatus,
+  WaitlistEntry, WaitlistStatus,
+  NotificationLog, NotificationStatus, NotificationEventType,
+}
 
 export type CourseWithCategory = Course & {
   category: CourseCategory
@@ -30,3 +42,21 @@ export type PaginatedResponse<T> = {
   page: number
   pageSize: number
 }
+
+export type EnrollmentWithDetails = CourseEnrollment & {
+  employee: Pick<Employee, 'id' | 'name' | 'department' | 'unit'>
+  session: CourseSession & {
+    course: Pick<Course, 'id' | 'name'>
+  }
+}
+
+export type WaitlistEntryWithDetails = WaitlistEntry & {
+  employee: Pick<Employee, 'id' | 'name' | 'department'>
+  session: CourseSession & {
+    course: Pick<Course, 'id' | 'name'>
+  }
+}
+
+export type CreateEnrollmentResult =
+  | { type: 'enrollment'; enrollment: CourseEnrollment }
+  | { type: 'waitlist'; waitlistEntry: WaitlistEntry }
