@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCourseById } from '@/lib/courses/service'
 import CourseStatusButton from './CourseStatusButton'
+import CancelSessionButton from './CancelSessionButton'
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -85,6 +86,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">講師</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">名額</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">狀態</th>
+                <th className="px-6 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -95,6 +97,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
                   <td className="px-6 py-4 text-sm">{session.instructorName}</td>
                   <td className="px-6 py-4 text-sm">{session.enrolledCount} / {session.capacity}</td>
                   <td className="px-6 py-4 text-sm">{sessionStatusLabel[session.status]}</td>
+                  <td className="px-6 py-4 text-right">
+                    {session.status === 'OPEN' && (
+                      <CancelSessionButton courseId={id} sessionId={session.id} />
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

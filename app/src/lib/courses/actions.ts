@@ -3,7 +3,8 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { createCourse, updateCourse, changeCourseStatus } from './service'
-import { createCourseSchema, updateCourseSchema, statusChangeSchema } from './validations'
+import { createSession, cancelSession } from './session-service'
+import { createCourseSchema, updateCourseSchema, statusChangeSchema, createSessionSchema } from './validations'
 
 export async function createCourseAction(formData: FormData) {
   const session = await auth()
@@ -74,4 +75,35 @@ export async function changeCourseStatusAction(id: string, formData: FormData) {
 
   await changeCourseStatus(id, parsed.data.status)
   redirect(`/courses/${id}`)
+}
+
+export async function createSessionAction(courseId: string, formData: FormData) {
+  const session = await auth()
+  if (!session || (session.user as { role?: string })?.role !== 'HR') {
+    throw new Error('權限不足')
+  }
+
+  const raw = {
+    startDate: formData.get('startDate') as string,
+    endDate: formData.get('endDate') as string | undefined || undefined,
+    location: formData.get('location') as string,
+    instructorName: formData.get('instructorName') as string,
+    capacity: Number(formData.get('capacity')),
+  }
+
+  const parsed = createSessionSchema.safeParse(raw)
+  if (!parsed.success) throw new Error(JSON.stringify(parsed.error.flatten()))
+
+  await createSession(courseId, parsed.data)
+  redirect(`/courses/${courseId}`)
+}
+
+export async function cancelSessionAction(courseId: string, sessionId: string) {
+  const session = await auth()
+  if (!session || (session.user as { role?: string })?.role !== 'HR') {
+    throw new Error('權限不足')
+  }
+
+  await cancelSession(sessionId, session.user?.email ?? 'unknown')
+  redirect(`/courses/${courseId}`)
 }
