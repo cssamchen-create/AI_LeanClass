@@ -7,6 +7,7 @@ import type {
   CourseReflection,
   Quiz, QuizQuestion, QuizAttempt, QuizAnswer, QuestionType,
   EmployeeTrainingRecord,
+  CommitmentRecord, CommitmentStatus,
 } from '@prisma/client'
 
 export type {
@@ -18,6 +19,7 @@ export type {
   CourseReflection,
   Quiz, QuizQuestion, QuizAttempt, QuizAnswer, QuestionType,
   EmployeeTrainingRecord,
+  CommitmentRecord, CommitmentStatus,
 }
 
 export type CourseWithCategory = Course & {
@@ -94,6 +96,18 @@ export type CompletionWithDetails = CourseEnrollment & {
   }
   reflection?: CourseReflection | null
   quizAttempts?: QuizAttempt[]
+}
+
+export type CommitmentRecordWithDetails = CommitmentRecord & {
+  employee: Pick<Employee, 'id' | 'name' | 'email' | 'department' | 'unit'>
+  course: Pick<Course, 'id' | 'name' | 'measurementValue' | 'measurementUnit'>
+  enrollment: Pick<CourseEnrollment, 'id' | 'status'>
+}
+
+export type CompensationScheduleItem = {
+  monthsCompleted: number
+  remainingMonths: number
+  amount: string
 }
 
 export type TrainingRecordSummary = {

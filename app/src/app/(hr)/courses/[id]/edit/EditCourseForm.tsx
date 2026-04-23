@@ -11,7 +11,7 @@ export default function EditCourseForm({ course }: { course: CourseWithDetails }
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { register, handleSubmit, formState: { errors } } = useForm<UpdateCourseInput>({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<UpdateCourseInput>({
     resolver: zodResolver(updateCourseSchema),
     defaultValues: {
       name: course.name,
@@ -20,8 +20,13 @@ export default function EditCourseForm({ course }: { course: CourseWithDetails }
       measurementValue: course.measurementValue,
       requiresReflection: course.requiresReflection,
       isGroupCourse: course.isGroupCourse,
+      requiresCommitment: course.requiresCommitment,
+      commitmentMonths: course.commitmentMonths ?? undefined,
+      commitmentFee: course.commitmentFee ? Number(course.commitmentFee) : undefined,
     },
   })
+
+  const requiresCommitment = watch('requiresCommitment')
 
   useEffect(() => {
     fetch('/api/course-categories')
@@ -96,7 +101,43 @@ export default function EditCourseForm({ course }: { course: CourseWithDetails }
           <input type="checkbox" {...register('isGroupCourse')} />
           <span>集團內課程</span>
         </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" {...register('requiresCommitment')} />
+          <span>此課程需服務承諾書</span>
+        </label>
       </div>
+
+      {requiresCommitment && (
+        <div className="border border-amber-200 bg-amber-50 rounded-lg p-4 space-y-4">
+          <p className="text-sm font-medium text-amber-800">服務承諾條款</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">留任年限（月）</label>
+              <input
+                type="number" min="1" max="120"
+                {...register('commitmentMonths', { valueAsNumber: true })}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="例如 24"
+              />
+              {errors.commitmentMonths && (
+                <p className="text-red-500 text-xs mt-1">{errors.commitmentMonths.message}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">課程費用（元）</label>
+              <input
+                type="number" min="0"
+                {...register('commitmentFee', { valueAsNumber: true })}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="例如 30000"
+              />
+              {errors.commitmentFee && (
+                <p className="text-red-500 text-xs mt-1">{errors.commitmentFee.message}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-3 pt-2">
         <button

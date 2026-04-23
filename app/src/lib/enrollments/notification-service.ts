@@ -306,3 +306,85 @@ export function buildCourseCompletedNotification(
     body: `${employee.name} 您好，\n\n恭喜您完成「${courseName}」課程！\n\n取得：${hoursOrCredits}\n\n完訓紀錄已更新至您的訓練歷程。\n\n教育訓練系統`,
   }
 }
+
+export function buildCommitmentSignatureRequiredNotification(
+  employee: { id: string; email: string; name: string },
+  courseName: string,
+  deadline: Date,
+  enrollmentId: string,
+): NotificationPayload {
+  return {
+    recipientId: employee.id,
+    recipientEmail: employee.email,
+    eventType: 'COMMITMENT_SIGNATURE_REQUIRED',
+    enrollmentId,
+    subject: `【教育訓練】請簽署服務承諾書：${courseName}`,
+    body: `${employee.name} 您好，\n\n您報名的「${courseName}」課程已通過 HR 核准，但此課程需要您簽署服務承諾書。\n\n請在 ${deadline.toLocaleString('zh-TW')} 前登入系統完成簽署，逾時報名將自動取消。\n\n教育訓練系統`,
+  }
+}
+
+export function buildCommitmentSignedNotification(
+  employee: { id: string; email: string; name: string },
+  courseName: string,
+  commitmentExpiresAt: Date,
+  enrollmentId: string,
+): NotificationPayload {
+  return {
+    recipientId: employee.id,
+    recipientEmail: employee.email,
+    eventType: 'COMMITMENT_SIGNED',
+    enrollmentId,
+    subject: `【教育訓練】服務承諾書簽署成功：${courseName}`,
+    body: `${employee.name} 您好，\n\n您已成功簽署「${courseName}」課程的服務承諾書，報名已確認。\n\n承諾到期日：${commitmentExpiresAt.toLocaleDateString('zh-TW')}\n\n請準時出席課程。\n\n教育訓練系統`,
+  }
+}
+
+export function buildCommitmentSignatureExpiredNotification(
+  employee: { id: string; email: string; name: string },
+  courseName: string,
+  enrollmentId: string,
+): NotificationPayload {
+  return {
+    recipientId: employee.id,
+    recipientEmail: employee.email,
+    eventType: 'COMMITMENT_SIGNATURE_EXPIRED',
+    enrollmentId,
+    subject: `【教育訓練】服務承諾書簽署逾時：${courseName}`,
+    body: `${employee.name} 您好，\n\n您的「${courseName}」服務承諾書簽署已逾 48 小時，報名已自動取消。\n\n如需重新報名，請重新申請。\n\n教育訓練系統`,
+  }
+}
+
+export function buildCommitmentExpiringSoonNotification(
+  hr: { id: string; email: string; name: string },
+  expiringItems: Array<{ employeeName: string; courseName: string; expiresAt: Date; daysLeft: number }>,
+): NotificationPayload {
+  const itemLines = expiringItems
+    .map((item) => `  - ${item.employeeName}（${item.courseName}）：${item.expiresAt.toLocaleDateString('zh-TW')}（剩 ${item.daysLeft} 天）`)
+    .join('\n')
+  return {
+    recipientId: hr.id,
+    recipientEmail: hr.email,
+    eventType: 'COMMITMENT_EXPIRING_SOON',
+    subject: `【教育訓練】本月即將到期服務承諾書清單`,
+    body: `${hr.name} 您好，\n\n以下員工的服務承諾書將在 30 天內到期，請注意追蹤：\n\n${itemLines}\n\n請登入教育訓練系統查看詳情。\n\n教育訓練系統`,
+  }
+}
+
+export function buildCommitmentCompensationNotification(
+  hr: { id: string; email: string; name: string },
+  employeeName: string,
+  resignedAt: Date,
+  totalCompensation: string,
+  items: Array<{ courseName: string; compensationAmount: string; note: string }>,
+): NotificationPayload {
+  const itemLines = items
+    .map((item) => `  - ${item.courseName}：${item.compensationAmount} 元（${item.note}）`)
+    .join('\n')
+  return {
+    recipientId: hr.id,
+    recipientEmail: hr.email,
+    eventType: 'COMMITMENT_COMPENSATION',
+    subject: `【教育訓練】員工離職服務承諾賠償計算：${employeeName}`,
+    body: `${hr.name} 您好，\n\n員工 ${employeeName} 已於 ${resignedAt.toLocaleDateString('zh-TW')} 標記離職，以下為服務承諾賠償計算結果：\n\n${itemLines}\n\n合計應賠償：${totalCompensation} 元\n\n請登入教育訓練系統查看詳情。\n\n教育訓練系統`,
+  }
+}

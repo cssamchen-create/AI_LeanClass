@@ -30,6 +30,15 @@ export default async function HREnrollmentsPage() {
     orderBy: { createdAt: 'asc' },
   })
 
+  const pendingCommitmentEnrollments = await prisma.courseEnrollment.findMany({
+    where: { status: 'PENDING_COMMITMENT' },
+    include: {
+      employee: { select: { id: true, name: true, department: true, unit: true } },
+      session: { include: { course: { select: { id: true, name: true } } } },
+    },
+    orderBy: { hrReviewedAt: 'asc' },
+  })
+
   const confirmedEnrollments = await prisma.courseEnrollment.findMany({
     where: { status: 'CONFIRMED' },
     include: {
@@ -155,6 +164,32 @@ export default async function HREnrollmentsPage() {
           </div>
         )}
       </section>
+
+      {/* Pending Commitment */}
+      {pendingCommitmentEnrollments.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">
+            待簽署承諾書 <span className="ml-2 text-sm font-normal text-gray-500">({pendingCommitmentEnrollments.length})</span>
+          </h2>
+          <div className="space-y-3">
+            {pendingCommitmentEnrollments.map((enrollment) => (
+              <div key={enrollment.id} className="bg-white border border-orange-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium text-gray-900">{enrollment.session.course.name}</div>
+                    <div className="text-sm text-gray-600">
+                      {enrollment.employee.name} ｜ {new Date(enrollment.session.startDate).toLocaleDateString('zh-TW')}
+                    </div>
+                  </div>
+                  <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
+                    待簽署承諾書
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Confirmed enrollments (for cancel management) */}
       <section>

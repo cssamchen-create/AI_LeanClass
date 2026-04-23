@@ -61,6 +61,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
           <div><dt className="text-gray-500">心得必填</dt><dd className="mt-1">{course.requiresReflection ? '是' : '否'}</dd></div>
           <div><dt className="text-gray-500">集團內課程</dt><dd className="mt-1">{course.isGroupCourse ? '是' : '否'}</dd></div>
           <div>
+            <dt className="text-gray-500">服務承諾</dt>
+            <dd className="mt-1">
+              {course.requiresCommitment && course.commitmentMonths != null && course.commitmentFee != null
+                ? `${course.commitmentMonths} 個月 / ${Number(course.commitmentFee).toLocaleString('zh-TW')} 元`
+                : '不需要'}
+            </dd>
+          </div>
+          <div>
             <dt className="text-gray-500">狀態</dt>
             <dd className="mt-1">
               <span className={`inline-flex px-2 py-0.5 rounded-full text-xs ${statusColor[course.status]}`}>

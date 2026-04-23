@@ -5,6 +5,7 @@ import { cancelEnrollmentAction, confirmWaitlistAction } from '@/lib/enrollments
 const STATUS_LABELS: Record<string, string> = {
   PENDING_MANAGER: '待主管審核',
   PENDING_HR: '待 HR 核准',
+  PENDING_COMMITMENT: '待簽署承諾書',
   CONFIRMED: '已確認',
   REJECTED: '已退回',
   CANCELLED: '已取消',
@@ -21,6 +22,7 @@ const STATUS_LABELS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   PENDING_MANAGER: 'bg-yellow-100 text-yellow-800',
   PENDING_HR: 'bg-blue-100 text-blue-800',
+  PENDING_COMMITMENT: 'bg-orange-100 text-orange-800',
   CONFIRMED: 'bg-green-100 text-green-800',
   REJECTED: 'bg-red-100 text-red-800',
   CANCELLED: 'bg-gray-100 text-gray-700',
@@ -138,6 +140,14 @@ export default async function MyEnrollmentsPage() {
                           取消申請
                         </button>
                       </form>
+                    )}
+                    {enrollment.status === 'PENDING_COMMITMENT' && (
+                      <a
+                        href={`/enrollments/${enrollment.id}/commitment`}
+                        className="px-3 py-1 text-xs text-orange-600 border border-orange-300 hover:bg-orange-50 rounded"
+                      >
+                        簽署承諾書
+                      </a>
                     )}
                     {['PENDING_REFLECTION', 'REFLECTION_RETURNED'].includes(enrollment.status) && (
                       <a

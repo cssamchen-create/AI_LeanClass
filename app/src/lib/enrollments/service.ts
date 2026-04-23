@@ -7,6 +7,7 @@ import {
   buildManagerReviewNeededNotification,
   buildManagerReviewResultNotification,
   buildHRReviewResultNotification,
+  buildCommitmentSignatureRequiredNotification,
 } from './notification-service'
 import { promoteNextWaitlistEntry } from './waitlist-service'
 
@@ -224,10 +225,15 @@ export async function approveByHR(enrollmentId: string, hrId: string) {
       throw new Error('名額已滿，無法核准')
     }
 
+    const course = enrollment.session.course
+    const requiresCommitment = course.requiresCommitment
+
+    const newStatus = requiresCommitment ? 'PENDING_COMMITMENT' : 'CONFIRMED'
+
     const updated = await tx.courseEnrollment.update({
       where: { id: enrollmentId },
       data: {
-        status: 'CONFIRMED',
+        status: newStatus,
         reviewedByHrId: hrId,
         hrReviewedAt: new Date(),
       },
@@ -238,19 +244,49 @@ export async function approveByHR(enrollmentId: string, hrId: string) {
       data: { enrolledCount: { increment: 1 } },
     })
 
-    return { updated, enrollment }
+    if (requiresCommitment && course.commitmentMonths && course.commitmentFee != null) {
+      const signatureDeadline = new Date(Date.now() + 48 * 60 * 60 * 1000)
+      await tx.commitmentRecord.create({
+        data: {
+          enrollmentId,
+          courseId: course.id,
+          employeeId: enrollment.employeeId,
+          signatureDeadline,
+          commitmentMonths: course.commitmentMonths,
+          commitmentFee: course.commitmentFee,
+        },
+      })
+    }
+
+    return { updated, enrollment, requiresCommitment }
   })
 
-  await sendNotification(
-    buildHRReviewResultNotification(
-      { id: result.enrollment.employee.id, email: result.enrollment.employee.email, name: result.enrollment.employee.name },
-      result.enrollment.session.course.name,
-      result.enrollment.session.startDate,
-      true,
-      null,
-      enrollmentId,
-    ),
-  )
+  if (result.requiresCommitment) {
+    const deadline = new Date(Date.now() + 48 * 60 * 60 * 1000)
+    await sendNotification(
+      buildCommitmentSignatureRequiredNotification(
+        {
+          id: result.enrollment.employee.id,
+          email: result.enrollment.employee.email,
+          name: result.enrollment.employee.name,
+        },
+        result.enrollment.session.course.name,
+        deadline,
+        enrollmentId,
+      ),
+    )
+  } else {
+    await sendNotification(
+      buildHRReviewResultNotification(
+        { id: result.enrollment.employee.id, email: result.enrollment.employee.email, name: result.enrollment.employee.name },
+        result.enrollment.session.course.name,
+        result.enrollment.session.startDate,
+        true,
+        null,
+        enrollmentId,
+      ),
+    )
+  }
 
   return result.updated
 }

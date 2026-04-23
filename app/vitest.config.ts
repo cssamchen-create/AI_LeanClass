@@ -12,6 +12,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@prisma/client/runtime/library': path.resolve(__dirname, './node_modules/@prisma/client/runtime/client.js'),
     },
   },
 })

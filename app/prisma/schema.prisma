@@ -16,6 +16,7 @@ enum EmployeeRole {
 enum EnrollmentStatus {
   PENDING_MANAGER
   PENDING_HR
+  PENDING_COMMITMENT
   CONFIRMED
   REJECTED
   CANCELLED
@@ -49,6 +50,14 @@ enum NotificationStatus {
   RETRYING
 }
 
+enum CommitmentStatus {
+  PENDING_SIGNATURE
+  ACTIVE
+  EXPIRED
+  VOIDED
+  COMPENSATION_NOTED
+}
+
 enum NotificationEventType {
   ENROLLMENT_SUBMITTED
   MANAGER_REVIEW_NEEDED
@@ -67,6 +76,11 @@ enum NotificationEventType {
   REFLECTION_RETURNED
   QUIZ_GRADED
   COURSE_COMPLETED
+  COMMITMENT_SIGNATURE_REQUIRED
+  COMMITMENT_SIGNED
+  COMMITMENT_SIGNATURE_EXPIRED
+  COMMITMENT_EXPIRING_SOON
+  COMMITMENT_COMPENSATION
 }
 
 enum MeasurementUnit {
@@ -111,8 +125,12 @@ model Course {
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   createdBy          String
+  requiresCommitment Boolean         @default(false)
+  commitmentMonths   Int?
+  commitmentFee      Decimal?        @db.Decimal(10, 2)
   sessions           CourseSession[]
   quiz               Quiz?
+  commitmentRecords  CommitmentRecord[]
 }
 
 model CourseSession {
@@ -148,15 +166,17 @@ model Employee {
   subordinates Employee[]   @relation("ManagerRelation")
   hireDate     DateTime
   isActive     Boolean      @default(true)
+  resignedAt   DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  enrollments      CourseEnrollment[] @relation("EnrollmentApplicant")
-  managerReviews   CourseEnrollment[] @relation("EnrollmentManagerReviewer")
-  hrReviews        CourseEnrollment[] @relation("EnrollmentHrReviewer")
-  waitlistEntries  WaitlistEntry[]
-  notificationLogs NotificationLog[]
-  trainingRecords  EmployeeTrainingRecord[]
+  enrollments       CourseEnrollment[] @relation("EnrollmentApplicant")
+  managerReviews    CourseEnrollment[] @relation("EnrollmentManagerReviewer")
+  hrReviews         CourseEnrollment[] @relation("EnrollmentHrReviewer")
+  waitlistEntries   WaitlistEntry[]
+  notificationLogs  NotificationLog[]
+  trainingRecords   EmployeeTrainingRecord[]
+  commitmentRecords CommitmentRecord[]
 }
 
 model CourseEnrollment {
@@ -177,9 +197,10 @@ model CourseEnrollment {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
-  notifications  NotificationLog[]
-  reflection     CourseReflection?
-  quizAttempts   QuizAttempt[]
+  notifications    NotificationLog[]
+  reflection       CourseReflection?
+  quizAttempts     QuizAttempt[]
+  commitmentRecord CommitmentRecord?
 }
 
 model WaitlistEntry {
@@ -298,4 +319,29 @@ model EmployeeTrainingRecord {
   updatedAt    DateTime @updatedAt
 
   @@unique([employeeId, year])
+}
+
+model CommitmentRecord {
+  id                 String           @id @default(uuid())
+  enrollmentId       String           @unique
+  enrollment         CourseEnrollment @relation(fields: [enrollmentId], references: [id])
+  courseId           String
+  course             Course           @relation(fields: [courseId], references: [id])
+  employeeId         String
+  employee           Employee         @relation(fields: [employeeId], references: [id])
+
+  status             CommitmentStatus @default(PENDING_SIGNATURE)
+  signatureDeadline  DateTime
+  signedAt           DateTime?
+
+  commitmentMonths   Int
+  commitmentFee      Decimal          @db.Decimal(10, 2)
+  commitmentExpiresAt DateTime?
+
+  compensationAmount Decimal?         @db.Decimal(10, 2)
+  compensationNote   String?
+  compensationAt     DateTime?
+
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }

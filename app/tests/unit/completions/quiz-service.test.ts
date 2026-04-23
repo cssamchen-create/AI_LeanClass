@@ -93,7 +93,13 @@ describe('gradeEssayAnswers', () => {
   it('所有題目評分完成後計算 totalScore 與 passed', async () => {
     const mockAttempt = {
       id: 'att-1', enrollmentId: 'enr-1', maxScore: 30,
-      quiz: { passingScore: 60 },
+      quiz: {
+        passingScore: 60,
+        questions: [
+          { id: 'q-mc', type: 'MULTIPLE_CHOICE', points: 10 },
+          { id: 'q-essay', type: 'ESSAY', points: 20 },
+        ],
+      },
       answers: [
         { id: 'ans-mc', questionId: 'q-mc', question: { type: 'MULTIPLE_CHOICE' }, score: 10 },
         { id: 'ans-essay', questionId: 'q-essay', question: { type: 'ESSAY' }, score: null },

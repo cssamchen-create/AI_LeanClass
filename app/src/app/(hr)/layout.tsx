@@ -33,6 +33,9 @@ export default async function HRLayout({ children }: { children: React.ReactNode
               <Link href="/hr/sessions" className="text-gray-600 hover:text-gray-900 text-sm">
                 課程梯次
               </Link>
+              <Link href="/commitments" className="text-gray-600 hover:text-gray-900 text-sm">
+                服務承諾
+              </Link>
             </div>
             <div className="text-sm text-gray-500">
               {session.user?.name} (HR)
