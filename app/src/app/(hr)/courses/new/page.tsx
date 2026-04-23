@@ -11,7 +11,8 @@ export default function NewCoursePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<CreateCourseInput>({
-    resolver: zodResolver(createCourseSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(createCourseSchema) as any,
     defaultValues: {
       measurementUnit: 'HOURS',
       requiresReflection: true,

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Decimal } from '@prisma/client/runtime/library'
+import { Decimal } from '@prisma/client-runtime-utils'
 
 export async function updateTrainingRecord(employeeId: string, sessionId: string) {
   const session = await prisma.courseSession.findUnique({

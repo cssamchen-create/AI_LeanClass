@@ -61,7 +61,7 @@ export default async function EnrollPage({ params }: PageProps) {
         </div>
       )}
 
-      <form action={createEnrollmentAction}>
+      <form action={async (formData) => { await createEnrollmentAction(formData) }}>
         <input type="hidden" name="sessionId" value={sessionId} />
         <div className="flex gap-4">
           <button

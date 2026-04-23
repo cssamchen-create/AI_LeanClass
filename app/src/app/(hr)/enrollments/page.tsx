@@ -87,7 +87,7 @@ export default async function HREnrollmentsPage() {
                     >
                       評分測驗
                     </a>
-                    <form action={closeEnrollmentAction.bind(null, enrollment.id)}>
+                    <form action={async () => { await closeEnrollmentAction(enrollment.id) }}>
                       <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg">
                         結案
                       </button>
@@ -151,7 +151,7 @@ export default async function HREnrollmentsPage() {
                     </div>
                   </div>
                   <div className="flex gap-3 ml-6">
-                    <form action={approveEnrollmentByHRAction.bind(null, enrollment.id)}>
+                    <form action={async () => { await approveEnrollmentByHRAction(enrollment.id) }}>
                       <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg">
                         核准
                       </button>
@@ -206,7 +206,7 @@ export default async function HREnrollmentsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">已確認</span>
-                  <form action={cancelConfirmedEnrollmentAction.bind(null, enrollment.id)}>
+                  <form action={async () => { await cancelConfirmedEnrollmentAction(enrollment.id) }}>
                     <button type="submit" className="px-3 py-1 text-xs text-red-600 border border-red-300 hover:bg-red-50 rounded">
                       取消報名
                     </button>

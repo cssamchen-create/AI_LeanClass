@@ -56,7 +56,7 @@ export default async function ManagerEnrollmentsPage() {
                 </div>
 
                 <div className="flex gap-3 ml-6">
-                  <form action={approveEnrollmentAction.bind(null, enrollment.id)}>
+                  <form action={async () => { await approveEnrollmentAction(enrollment.id) }}>
                     <button
                       type="submit"
                       className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg"

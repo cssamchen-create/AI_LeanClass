@@ -88,7 +88,7 @@ export default async function MyEnrollmentsPage() {
                         <div className="text-xs text-gray-500">
                           期限：{new Date(entry.confirmDeadline).toLocaleString('zh-TW')}
                         </div>
-                        <form action={confirmWaitlistAction.bind(null, entry.id)}>
+                        <form action={async () => { await confirmWaitlistAction(entry.id) }}>
                           <button type="submit" className="mt-1 px-3 py-1 text-xs text-white bg-green-600 hover:bg-green-700 rounded">
                             確認報名
                           </button>
@@ -132,7 +132,7 @@ export default async function MyEnrollmentsPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     {['PENDING_MANAGER', 'PENDING_HR'].includes(enrollment.status) && (
-                      <form action={cancelEnrollmentAction.bind(null, enrollment.id)}>
+                      <form action={async () => { await cancelEnrollmentAction(enrollment.id) }}>
                         <button
                           type="submit"
                           className="px-3 py-1 text-xs text-red-600 border border-red-300 hover:bg-red-50 rounded"

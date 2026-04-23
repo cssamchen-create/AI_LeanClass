@@ -47,9 +47,9 @@ export default async function HRCommitmentsPage({
     : undefined
 
   const where = {
-    ...(statusFilter && { status: statusFilter }),
-    ...(expiringFilter && { commitmentExpiresAt: expiringFilter }),
-    ...(isExpiringTab && { status: 'ACTIVE' as never }),
+    ...(statusFilter ? { status: statusFilter } : {}),
+    ...(expiringFilter ? { commitmentExpiresAt: expiringFilter } : {}),
+    ...(isExpiringTab ? { status: 'ACTIVE' as never } : {}),
   }
 
   const [records, total] = await Promise.all([

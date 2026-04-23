@@ -7,8 +7,8 @@ import { confirmWaitlistEntry } from './waitlist-service'
 import { resendNotification } from './notification-service'
 import { createEnrollmentSchema, rejectSchema } from './validations'
 
-function getEmployeeId(session: Awaited<ReturnType<typeof auth>>): string {
-  const id = (session?.user as { id?: string })?.id
+function getEmployeeId(session: { user?: { id?: string } | null } | null): string {
+  const id = session?.user?.id
   if (!id) throw new Error('無法識別使用者')
   return id
 }

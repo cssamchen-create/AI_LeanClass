@@ -1,4 +1,4 @@
-import { Decimal } from '@prisma/client/runtime/library'
+import { Decimal } from '@prisma/client-runtime-utils'
 import { addMonths, differenceInMonths } from 'date-fns'
 import { prisma } from '@/lib/prisma'
 import {

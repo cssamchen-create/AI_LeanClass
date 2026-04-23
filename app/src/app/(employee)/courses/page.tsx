@@ -87,13 +87,13 @@ export default async function EmployeeCoursesPage() {
                         <div className="ml-4">
                           {enrollStatus ? (
                             <span className="inline-flex px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                              {{
+                              {({
                                 PENDING_MANAGER: '待主管審核',
                                 PENDING_HR: '待 HR 核准',
                                 CONFIRMED: '已確認',
                                 REJECTED: '已退回',
                                 CANCELLED: '已取消',
-                              }[enrollStatus] ?? enrollStatus}
+                              } as Record<string, string>)[enrollStatus] ?? enrollStatus}
                             </span>
                           ) : waitlistInfo ? (
                             <span className="inline-flex px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">

@@ -26,7 +26,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const body = await req.json()
   const parsed = createResourceSchema.safeParse(body)
   if (!parsed.success) {
-    const firstError = parsed.error.errors[0]?.message ?? '輸入格式錯誤'
+    const firstError = parsed.error.issues[0]?.message ?? '輸入格式錯誤'
     return NextResponse.json({ error: firstError }, { status: 400 })
   }
 

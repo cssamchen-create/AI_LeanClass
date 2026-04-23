@@ -35,7 +35,7 @@ export async function POST(
   const { id: courseId } = await params
   const body = await request.json()
   const parsed = quizCreateSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
 
   try {
     const result = await createQuiz(courseId, session.user.id!, parsed.data)
@@ -58,7 +58,7 @@ export async function PUT(
   const { id: courseId } = await params
   const body = await request.json()
   const parsed = quizCreateSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
 
   try {
     const quiz = await getQuizByCourse(courseId)

@@ -6,7 +6,7 @@ import { gradeSchema } from '@/lib/completions/validations'
 async function handleGrade(request: NextRequest, attemptId: string, userId: string) {
   const body = await request.json()
   const parsed = gradeSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
 
   try {
     const result = await gradeEssayAnswers(attemptId, userId, parsed.data.grades)
