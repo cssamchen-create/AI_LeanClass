@@ -19,6 +19,9 @@ export default async function EmployeeLayout({ children }: { children: React.Rea
               <Link href="/employee/enrollments" className="text-gray-600 hover:text-gray-900 text-sm">
                 我的申請
               </Link>
+              <Link href="/employee/training-records" className="text-gray-600 hover:text-gray-900 text-sm">
+                訓練紀錄
+              </Link>
             </div>
             <div className="text-sm text-gray-500">{session.user?.name}</div>
           </div>

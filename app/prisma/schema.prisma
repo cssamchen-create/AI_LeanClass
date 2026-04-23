@@ -19,6 +19,19 @@ enum EnrollmentStatus {
   CONFIRMED
   REJECTED
   CANCELLED
+  ATTENDED
+  ABSENT
+  PENDING_REFLECTION
+  REFLECTION_RETURNED
+  PENDING_QUIZ
+  QUIZ_GRADING
+  PENDING_HR_CLOSE
+  COMPLETED
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  ESSAY
 }
 
 enum WaitlistStatus {
@@ -49,6 +62,11 @@ enum NotificationEventType {
   SESSION_CANCELLED
   ENROLLMENT_CANCELLED
   NOTIFICATION_FAILED
+  ATTENDANCE_CONFIRMED
+  ATTENDANCE_ABSENT
+  REFLECTION_RETURNED
+  QUIZ_GRADED
+  COURSE_COMPLETED
 }
 
 enum MeasurementUnit {
@@ -86,12 +104,15 @@ model Course {
   measurementValue   Float
   requiresReflection Boolean         @default(true)
   isGroupCourse      Boolean         @default(false)
+  requiresQuiz       Boolean         @default(false)
+  isNewHireTraining  Boolean         @default(false)
   status             CourseStatus    @default(DRAFT)
   knowledgeBaseRef   String?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   createdBy          String
   sessions           CourseSession[]
+  quiz               Quiz?
 }
 
 model CourseSession {
@@ -135,6 +156,7 @@ model Employee {
   hrReviews        CourseEnrollment[] @relation("EnrollmentHrReviewer")
   waitlistEntries  WaitlistEntry[]
   notificationLogs NotificationLog[]
+  trainingRecords  EmployeeTrainingRecord[]
 }
 
 model CourseEnrollment {
@@ -155,7 +177,9 @@ model CourseEnrollment {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
-  notifications NotificationLog[]
+  notifications  NotificationLog[]
+  reflection     CourseReflection?
+  quizAttempts   QuizAttempt[]
 }
 
 model WaitlistEntry {
@@ -192,4 +216,86 @@ model NotificationLog {
   sentAt         DateTime?
   errorMessage   String?
   createdAt      DateTime              @default(now())
+}
+
+model CourseReflection {
+  id           String           @id @default(uuid())
+  enrollmentId String           @unique
+  enrollment   CourseEnrollment @relation(fields: [enrollmentId], references: [id])
+  content      String
+  isLocked     Boolean          @default(true)
+  submittedAt  DateTime         @default(now())
+  returnedAt   DateTime?
+  returnNote   String?
+  updatedAt    DateTime         @updatedAt
+}
+
+model Quiz {
+  id           String         @id @default(uuid())
+  courseId     String         @unique
+  course       Course         @relation(fields: [courseId], references: [id])
+  passingScore Int
+  questions    QuizQuestion[]
+  attempts     QuizAttempt[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model QuizQuestion {
+  id        String       @id @default(uuid())
+  quizId    String
+  quiz      Quiz         @relation(fields: [quizId], references: [id])
+  type      QuestionType
+  content   String
+  order     Int
+  points    Int
+  options   Json?
+  answers   QuizAnswer[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model QuizAttempt {
+  id            String           @id @default(uuid())
+  enrollmentId  String
+  enrollment    CourseEnrollment @relation(fields: [enrollmentId], references: [id])
+  quizId        String
+  quiz          Quiz             @relation(fields: [quizId], references: [id])
+  attemptNumber Int
+  totalScore    Int?
+  maxScore      Int
+  passed        Boolean?
+  submittedAt   DateTime         @default(now())
+  gradedAt      DateTime?
+  answers       QuizAnswer[]
+  createdAt     DateTime         @default(now())
+}
+
+model QuizAnswer {
+  id         String       @id @default(uuid())
+  attemptId  String
+  attempt    QuizAttempt  @relation(fields: [attemptId], references: [id])
+  questionId String
+  question   QuizQuestion @relation(fields: [questionId], references: [id])
+  answer     String
+  score      Int?
+  gradedAt   DateTime?
+  graderNote String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@unique([attemptId, questionId])
+}
+
+model EmployeeTrainingRecord {
+  id           String   @id @default(uuid())
+  employeeId   String
+  employee     Employee @relation(fields: [employeeId], references: [id])
+  year         Int
+  totalHours   Decimal  @default(0) @db.Decimal(8, 2)
+  annualHours  Decimal  @default(0) @db.Decimal(8, 2)
+  totalCredits Decimal  @default(0) @db.Decimal(8, 2)
+  updatedAt    DateTime @updatedAt
+
+  @@unique([employeeId, year])
 }

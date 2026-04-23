@@ -238,3 +238,71 @@ export function buildWaitlistExpiredNotification(
     body: `${employee.name} 您好，\n\n「${courseName}」的遞補確認期限已到，您的等待資格已自動失效。\n\n如有需要，請重新申請其他梯次。\n\n教育訓練系統`,
   }
 }
+
+export function buildAttendanceConfirmedNotification(
+  employee: { id: string; email: string; name: string },
+  courseName: string,
+  attended: boolean,
+  enrollmentId: string,
+): NotificationPayload {
+  return {
+    recipientId: employee.id,
+    recipientEmail: employee.email,
+    eventType: attended ? 'ATTENDANCE_CONFIRMED' : 'ATTENDANCE_ABSENT',
+    enrollmentId,
+    subject: `【教育訓練】出席確認通知：${courseName}`,
+    body: attended
+      ? `${employee.name} 您好，\n\n「${courseName}」課程的出席已確認。\n\n請依照系統指引完成後續結案步驟（心得填寫/測驗）。\n\n教育訓練系統`
+      : `${employee.name} 您好，\n\n「${courseName}」課程紀錄顯示您未出席，若有疑問請聯絡 HR。\n\n教育訓練系統`,
+  }
+}
+
+export function buildReflectionReturnedNotification(
+  employee: { id: string; email: string; name: string },
+  courseName: string,
+  returnNote: string,
+  enrollmentId: string,
+): NotificationPayload {
+  return {
+    recipientId: employee.id,
+    recipientEmail: employee.email,
+    eventType: 'REFLECTION_RETURNED',
+    enrollmentId,
+    subject: `【教育訓練】心得退回通知：${courseName}`,
+    body: `${employee.name} 您好，\n\n您提交的「${courseName}」心得已被 HR 退回，請重新填寫。\n\n退回原因：${returnNote}\n\n請登入教育訓練系統修改後重新送出。\n\n教育訓練系統`,
+  }
+}
+
+export function buildQuizGradedNotification(
+  employee: { id: string; email: string; name: string },
+  courseName: string,
+  totalScore: number,
+  maxScore: number,
+  passed: boolean,
+  enrollmentId: string,
+): NotificationPayload {
+  return {
+    recipientId: employee.id,
+    recipientEmail: employee.email,
+    eventType: 'QUIZ_GRADED',
+    enrollmentId,
+    subject: `【教育訓練】測驗成績通知：${courseName}`,
+    body: `${employee.name} 您好，\n\n「${courseName}」測驗評分完成。\n\n成績：${totalScore} / ${maxScore} 分（${passed ? '通過' : '未通過'}）\n\n${passed ? '恭喜您通過測驗！系統將通知 HR 進行結案。' : '很遺憾，您此次測驗未達通過標準，請等候 HR 通知後續安排。'}\n\n教育訓練系統`,
+  }
+}
+
+export function buildCourseCompletedNotification(
+  employee: { id: string; email: string; name: string },
+  courseName: string,
+  hoursOrCredits: string,
+  enrollmentId: string,
+): NotificationPayload {
+  return {
+    recipientId: employee.id,
+    recipientEmail: employee.email,
+    eventType: 'COURSE_COMPLETED',
+    enrollmentId,
+    subject: `【教育訓練】課程完訓通知：${courseName}`,
+    body: `${employee.name} 您好，\n\n恭喜您完成「${courseName}」課程！\n\n取得：${hoursOrCredits}\n\n完訓紀錄已更新至您的訓練歷程。\n\n教育訓練系統`,
+  }
+}

@@ -13,7 +13,10 @@ export default auth((req) => {
   const isHRRoute =
     nextUrl.pathname.startsWith('/courses') ||
     nextUrl.pathname.startsWith('/course-categories') ||
-    nextUrl.pathname.startsWith('/employees')
+    nextUrl.pathname.startsWith('/employees') ||
+    nextUrl.pathname.startsWith('/sessions') ||
+    nextUrl.pathname.startsWith('/enrollments') ||
+    nextUrl.pathname.startsWith('/notifications')
   const isApiHRRoute =
     nextUrl.pathname.startsWith('/api/courses') ||
     nextUrl.pathname.startsWith('/api/course-categories') ||
@@ -27,7 +30,8 @@ export default auth((req) => {
   const isEmployeeRoute = nextUrl.pathname.startsWith('/employee')
   const isApiEnrollmentRoute =
     nextUrl.pathname.startsWith('/api/enrollments') ||
-    nextUrl.pathname.startsWith('/api/waitlist/')
+    nextUrl.pathname.startsWith('/api/waitlist/') ||
+    nextUrl.pathname.startsWith('/api/employee/')
 
   if (!isLoggedIn && (isHRRoute || isManagerRoute || isEmployeeRoute || isApiHRRoute || isApiManagerRoute || isApiEnrollmentRoute)) {
     return NextResponse.redirect(new URL('/login', nextUrl))
@@ -53,6 +57,9 @@ export const config = {
     '/courses/:path*',
     '/course-categories/:path*',
     '/employees/:path*',
+    '/sessions/:path*',
+    '/enrollments/:path*',
+    '/notifications/:path*',
     '/manager/:path*',
     '/employee/:path*',
     '/api/courses/:path*',
@@ -61,5 +68,6 @@ export const config = {
     '/api/waitlist/:path*',
     '/api/manager/:path*',
     '/api/hr/:path*',
+    '/api/employee/:path*',
   ],
 }

@@ -8,6 +8,14 @@ const STATUS_LABELS: Record<string, string> = {
   CONFIRMED: '已確認',
   REJECTED: '已退回',
   CANCELLED: '已取消',
+  ATTENDED: '已出席',
+  ABSENT: '缺席',
+  PENDING_REFLECTION: '待填寫心得',
+  REFLECTION_RETURNED: '心得退回',
+  PENDING_QUIZ: '待完成測驗',
+  QUIZ_GRADING: '測驗評分中',
+  PENDING_HR_CLOSE: '待結案',
+  COMPLETED: '已結案',
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -16,6 +24,14 @@ const STATUS_COLORS: Record<string, string> = {
   CONFIRMED: 'bg-green-100 text-green-800',
   REJECTED: 'bg-red-100 text-red-800',
   CANCELLED: 'bg-gray-100 text-gray-700',
+  ATTENDED: 'bg-teal-100 text-teal-800',
+  ABSENT: 'bg-red-100 text-red-800',
+  PENDING_REFLECTION: 'bg-orange-100 text-orange-800',
+  REFLECTION_RETURNED: 'bg-yellow-100 text-yellow-800',
+  PENDING_QUIZ: 'bg-purple-100 text-purple-800',
+  QUIZ_GRADING: 'bg-indigo-100 text-indigo-800',
+  PENDING_HR_CLOSE: 'bg-blue-100 text-blue-800',
+  COMPLETED: 'bg-green-100 text-green-800',
 }
 
 export default async function MyEnrollmentsPage() {
@@ -122,6 +138,22 @@ export default async function MyEnrollmentsPage() {
                           取消申請
                         </button>
                       </form>
+                    )}
+                    {['PENDING_REFLECTION', 'REFLECTION_RETURNED'].includes(enrollment.status) && (
+                      <a
+                        href={`/employee/enrollments/${enrollment.id}/reflection`}
+                        className="px-3 py-1 text-xs text-orange-600 border border-orange-300 hover:bg-orange-50 rounded"
+                      >
+                        填寫心得
+                      </a>
+                    )}
+                    {enrollment.status === 'PENDING_QUIZ' && (
+                      <a
+                        href={`/employee/enrollments/${enrollment.id}/quiz`}
+                        className="px-3 py-1 text-xs text-purple-600 border border-purple-300 hover:bg-purple-50 rounded"
+                      >
+                        參加測驗
+                      </a>
                     )}
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${STATUS_COLORS[enrollment.status] ?? 'bg-gray-100 text-gray-700'}`}>
                       {STATUS_LABELS[enrollment.status] ?? enrollment.status}

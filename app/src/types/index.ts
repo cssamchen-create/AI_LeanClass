@@ -4,6 +4,9 @@ import type {
   CourseEnrollment, EnrollmentStatus,
   WaitlistEntry, WaitlistStatus,
   NotificationLog, NotificationStatus, NotificationEventType,
+  CourseReflection,
+  Quiz, QuizQuestion, QuizAttempt, QuizAnswer, QuestionType,
+  EmployeeTrainingRecord,
 } from '@prisma/client'
 
 export type {
@@ -12,6 +15,9 @@ export type {
   CourseEnrollment, EnrollmentStatus,
   WaitlistEntry, WaitlistStatus,
   NotificationLog, NotificationStatus, NotificationEventType,
+  CourseReflection,
+  Quiz, QuizQuestion, QuizAttempt, QuizAnswer, QuestionType,
+  EmployeeTrainingRecord,
 }
 
 export type CourseWithCategory = Course & {
@@ -60,3 +66,51 @@ export type WaitlistEntryWithDetails = WaitlistEntry & {
 export type CreateEnrollmentResult =
   | { type: 'enrollment'; enrollment: CourseEnrollment }
   | { type: 'waitlist'; waitlistEntry: WaitlistEntry }
+
+export type QuizQuestionWithOptions = QuizQuestion & {
+  options: Array<{ text: string; isCorrect: boolean }> | null
+}
+
+export type QuizWithQuestions = Quiz & {
+  questions: QuizQuestionWithOptions[]
+}
+
+export type QuizAnswerWithQuestion = QuizAnswer & {
+  question: QuizQuestion
+}
+
+export type QuizAttemptWithDetails = QuizAttempt & {
+  answers: QuizAnswerWithQuestion[]
+  quiz: Quiz
+  enrollment: CourseEnrollment & {
+    employee: Pick<Employee, 'id' | 'name' | 'email'>
+  }
+}
+
+export type CompletionWithDetails = CourseEnrollment & {
+  employee: Pick<Employee, 'id' | 'name' | 'email' | 'department'>
+  session: CourseSession & {
+    course: Pick<Course, 'id' | 'name' | 'measurementUnit' | 'measurementValue' | 'requiresReflection' | 'isGroupCourse' | 'requiresQuiz' | 'isNewHireTraining'>
+  }
+  reflection?: CourseReflection | null
+  quizAttempts?: QuizAttempt[]
+}
+
+export type TrainingRecordSummary = {
+  summary: {
+    year: number
+    annualHours: number
+    totalHours: number
+    totalCredits: number
+  }
+  completions: Array<{
+    enrollmentId: string
+    courseName: string
+    sessionDate: Date
+    hours: number
+    credits: number
+    quizScore?: number | null
+    quizPassed?: boolean | null
+    completedAt: Date
+  }>
+}
