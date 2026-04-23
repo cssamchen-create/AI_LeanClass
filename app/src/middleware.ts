@@ -33,7 +33,8 @@ export default auth((req) => {
   const isApiEnrollmentRoute =
     nextUrl.pathname.startsWith('/api/enrollments') ||
     nextUrl.pathname.startsWith('/api/waitlist/') ||
-    nextUrl.pathname.startsWith('/api/employee/')
+    nextUrl.pathname.startsWith('/api/employee/') ||
+    nextUrl.pathname.startsWith('/api/courses/')
 
   if (!isLoggedIn && (isHRRoute || isManagerRoute || isEmployeeRoute || isApiHRRoute || isApiManagerRoute || isApiEnrollmentRoute)) {
     return NextResponse.redirect(new URL('/login', nextUrl))
@@ -73,5 +74,6 @@ export const config = {
     '/api/manager/:path*',
     '/api/hr/:path*',
     '/api/employee/:path*',
+    '/api/courses/:path*',
   ],
 }

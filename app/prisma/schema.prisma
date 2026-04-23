@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum EmployeeRole {
@@ -48,6 +47,12 @@ enum NotificationStatus {
   SENT
   FAILED
   RETRYING
+  SKIPPED
+}
+
+enum ResourceType {
+  LINK
+  TEXT
 }
 
 enum CommitmentStatus {
@@ -131,6 +136,7 @@ model Course {
   sessions           CourseSession[]
   quiz               Quiz?
   commitmentRecords  CommitmentRecord[]
+  resources          KnowledgeBaseResource[]
 }
 
 model CourseSession {
@@ -344,4 +350,18 @@ model CommitmentRecord {
 
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
+}
+
+model KnowledgeBaseResource {
+  id        String       @id @default(uuid())
+  courseId  String
+  course    Course       @relation(fields: [courseId], references: [id])
+  title     String
+  type      ResourceType
+  content   String
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([courseId, order])
 }

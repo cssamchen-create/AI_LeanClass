@@ -45,6 +45,14 @@ async function attemptSend(
   subject: string,
   text: string,
 ): Promise<void> {
+  if (!process.env.SMTP_HOST) {
+    await prisma.notificationLog.update({
+      where: { id: logId },
+      data: { status: 'SKIPPED', lastAttemptAt: new Date() },
+    })
+    return
+  }
+
   try {
     await transporter.sendMail({ from: process.env.SMTP_FROM, to, subject, text })
     await prisma.notificationLog.update({

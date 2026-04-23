@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCourseById } from '@/lib/courses/service'
+import { getCourseResources } from '@/lib/knowledge-base/service'
 import CourseStatusButton from './CourseStatusButton'
 import CancelSessionButton from './CancelSessionButton'
+import KnowledgeBaseManager from './KnowledgeBaseManager'
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -13,6 +15,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   } catch {
     notFound()
   }
+
+  const resources = await getCourseResources(id)
 
   const statusLabel: Record<string, string> = {
     DRAFT: '草稿', ACTIVE: '上架', INACTIVE: '下架',
@@ -122,6 +126,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
           </table>
         )}
       </div>
+
+      <KnowledgeBaseManager courseId={id} initialResources={resources} />
     </div>
   )
 }

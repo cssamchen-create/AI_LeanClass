@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/005-training-reports/plan.md
+at specs/006-manager-kb-email/plan.md
 <!-- SPECKIT END -->

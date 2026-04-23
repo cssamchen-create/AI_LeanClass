@@ -16,6 +16,9 @@ export default async function ManagerLayout({ children }: { children: React.Reac
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-6">
               <span className="text-lg font-semibold text-gray-900">教育訓練系統</span>
+              <Link href="/manager/dashboard" className="text-gray-600 hover:text-gray-900 text-sm">
+                儀表板
+              </Link>
               <Link href="/manager/enrollments" className="text-gray-600 hover:text-gray-900 text-sm">
                 待審核申請
               </Link>
