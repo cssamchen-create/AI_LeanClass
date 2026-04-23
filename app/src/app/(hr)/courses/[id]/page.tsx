@@ -35,6 +35,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         </div>
         <div className="flex gap-2">
           <Link
+            href={`/courses/${id}/quiz`}
+            className="bg-white border text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50"
+          >
+            管理測驗
+          </Link>
+          <Link
             href={`/courses/${id}/edit`}
             className="bg-white border text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50"
           >

@@ -1,0 +1,35 @@
+import { auth } from '@/auth'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+
+export default async function EmployeeLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+  if (!session) redirect('/login')
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center gap-6">
+              <span className="text-lg font-semibold text-gray-900">教育訓練系統</span>
+              <Link href="/employee/courses" className="text-gray-600 hover:text-gray-900 text-sm">
+                課程瀏覽
+              </Link>
+              <Link href="/employee/enrollments" className="text-gray-600 hover:text-gray-900 text-sm">
+                我的申請
+              </Link>
+              <Link href="/employee/training-records" className="text-gray-600 hover:text-gray-900 text-sm">
+                訓練紀錄
+              </Link>
+            </div>
+            <div className="text-sm text-gray-500">{session.user?.name}</div>
+          </div>
+        </div>
+      </nav>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
+    </div>
+  )
+}

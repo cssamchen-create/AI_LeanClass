@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/waitlist-expiry",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/notification-retry",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}
