@@ -17,7 +17,8 @@ export default auth((req) => {
     nextUrl.pathname.startsWith('/sessions') ||
     nextUrl.pathname.startsWith('/enrollments') ||
     nextUrl.pathname.startsWith('/notifications') ||
-    nextUrl.pathname.startsWith('/commitments')
+    nextUrl.pathname.startsWith('/commitments') ||
+    nextUrl.pathname.startsWith('/reports')
   const isApiHRRoute =
     nextUrl.pathname.startsWith('/api/courses') ||
     nextUrl.pathname.startsWith('/api/course-categories') ||
@@ -62,6 +63,7 @@ export const config = {
     '/enrollments/:path*',
     '/notifications/:path*',
     '/commitments/:path*',
+    '/reports/:path*',
     '/manager/:path*',
     '/employee/:path*',
     '/api/courses/:path*',
